@@ -3,36 +3,35 @@ pragma solidity ^0.4.18;            // Because contracts on a blockchain are the
                                     // that is not supported by a then-current version of Solidity, thereby causing problems
                                     // later on. 
 
-/**
- * See the README file for detailed overview and status as well as open topics 
- * 
- * Pro-tip: copy and paste this into remix.ethereum.org to see what's working and not working
- */
+    /**
+     * See the README file for detailed overview and status as well as open topics 
+     * 
+     */
 
 
 
 
-/**
- * Declaring the contract "Lucy"
- * 
- * Incomplete: 2% progress
- *
- * Eventually, and per the notes above, Lucy's completed core functionality will be nested within the following contract 
- * declaration. Over time expect more sections/functions to be added here as they are completed. 
- * 
- * What I do not yet know is which existing contracts that may need to be referenced from Lucy to be functional, for example:
- * do we need to call a contract so Lucy knows what PoA, PoN, and PoC are?
- */ 
+    /**
+     * Declaring the contract "Lucy"
+     * 
+     * Incomplete: 2% progress
+     *
+     * Eventually, and per the notes above, Lucy's completed core functionality will be nested within the following contract 
+     * declaration. Over time expect more sections/functions to be added here as they are completed. 
+     * 
+     * What I do not yet know is which existing contracts that may need to be referenced from Lucy to be functional, for example:
+     * do we need to call a contract so Lucy knows what PoA, PoN, and PoC are?
+     */ 
 
 
 contract Lucy {
 
 
-/** 
- * (1) INITIALIZING ACTOR "TYPES"
- * 
- * Incomplete: 60% progress. 
- */
+    /** 
+     * (1) INITIALIZING ACTOR "TYPES"
+     * 
+     * Incomplete: 60% progress. 
+     */
 
     address Citizen;
     address Witness;
@@ -43,17 +42,17 @@ contract Lucy {
     address initiatingActor;
     // need to define other parties for purposes of token dist - TODO 
 
-/**
- * explicitly eliminated "nations" for now, but will need to be addressed. Also needed: multiple witnesses (with hard limit)
- */
+    /**
+     * explicitly eliminated "nations" for now, but will need to be addressed. Also needed: multiple witnesses (with hard limit)
+     */
 
     enum actorChoice { Citizen, Witness, Abritrator, Agreement, LegalCode } // "Nations" would be added here  
 
 
-/**
- * Assume "citizen" if not explicitly specified, which seems dangerous. I'd rather require that the actor type be explicitly
- * defined, else we have a corner case where a nation can review the fitness of a citizen via a PoA
- */
+    /**
+     * Assume "citizen" if not explicitly specified, which seems dangerous. I'd rather require that the actor type be explicitly
+     * defined, else we have a corner case where a nation can review the fitness of a citizen via a PoA
+     */
 
     actorChoice constant defaultChoice = actorChoice.Citizen;   
     function setActorType(uint _actorChoice) public {                                                                                                      // not obvious to me how the calling Dapp has an 
@@ -64,9 +63,9 @@ contract Lucy {
                                                         // treated like citizens, etc)
 
 
-/**
- * 
- */
+    /**
+     * 
+     */
     function getChoice() public returns (actorChoice) {
     }
 
@@ -78,11 +77,11 @@ contract Lucy {
 
 
  
- /**
-  * (2) INITIALIZING TOKEN TYPE PER ACTOR (PoA, PoC, PoN)
-  * 
-  * Incomplete: 30% complete 
-  */
+     /**
+      * (2) INITIALIZING TOKEN TYPE PER ACTOR (PoA, PoC, PoN)
+      * 
+      * Incomplete: 30% complete 
+      */
 
     function setTokenType() private returns (uint) {
         uint tokenType;
@@ -106,11 +105,11 @@ contract Lucy {
 
 
 
-/**
- * (3) SANTITY CHECKS AND SELF-PROTECTION  
- * 
- * Incomplete: 5% complete
- */
+    /**
+     * (3) SANTITY CHECKS AND SELF-PROTECTION  
+     * 
+     * Incomplete: 5% complete
+     */
 
 
 function lucyProtect() public {                        // I believe this protects us from being run unless there's ether, else it's thrown
@@ -118,28 +117,28 @@ function lucyProtect() public {                        // I believe this protect
         revert; }    
 
 
-/**
- * Calls or defines an agreementRegistry, which I assume is stored on IPFS, per the documentation. Need to get my
- * head around how this functions, but assume it's a precursor to the planned Exocortex
- * 
- * If this IS the precursor to the Exocortex, then we need to start being thoughtful about its stewardship in terms of 
- * access limitations, the aggregate expense of contract execution, and especially storage costs; we will need to likely 
- * start segmenting data by logical area so they can be cost-effectively referenced and utilized later, so as to not
- * require forks and/or confusion later on.
- * 
- * Provenance: Johan's code sample (blog post)
- * 
- */ 
+    /**
+     * Calls or defines an agreementRegistry, which I assume is stored on IPFS, per the documentation. Need to get my
+     * head around how this functions, but assume it's a precursor to the planned Exocortex
+     * 
+     * If this IS the precursor to the Exocortex, then we need to start being thoughtful about its stewardship in terms of 
+     * access limitations, the aggregate expense of contract execution, and especially storage costs; we will need to likely 
+     * start segmenting data by logical area so they can be cost-effectively referenced and utilized later, so as to not
+     * require forks and/or confusion later on.
+     * 
+     * Provenance: Johan's code sample (blog post)
+     * 
+     */ 
 
     mapping(bytes32 => address) agreementRegistry;  
                                                     
                                                  
 
-/**
- * Apparently verifies Lucy. I'll need to study how, as this came from Johan's code sample, and I need to better understand
- * how it functions and if it's adequate (and if it needs to be modified to accommodate the abstracted actors and tokens)
- * 
- */ 
+    /**
+     * Apparently verifies Lucy. I'll need to study how, as this came from Johan's code sample, and I need to better understand
+     * how it functions and if it's adequate (and if it needs to be modified to accommodate the abstracted actors and tokens)
+     * 
+     */ 
 
     function verifyLucy () public {
         address agreementID;
@@ -151,16 +150,16 @@ function lucyProtect() public {                        // I believe this protect
 
 
 
- /**
-  * (4) FACILITATE CHAT INTERACTON BETWEEN TWO OR MORE ACTORS
-  * 
-  * Incomplete: 15% progress 
-  */
+     /**
+      * (4) FACILITATE CHAT INTERACTON BETWEEN TWO OR MORE ACTORS
+      * 
+      * Incomplete: 15% progress 
+      */
 
 
-/**
- * Search for citizens, arbitrators, contracts, legal codes, and nations as well as their PoA, PoC, and PoN
- */
+    /**
+     * Search for citizens, arbitrators, contracts, legal codes, and nations as well as their PoA, PoC, and PoN
+     */
  
     event _viewedReputation (address indexed actorChoice, uint _tokenType); // This searches the transaction log in Ethereum 
 
@@ -173,12 +172,12 @@ function lucyProtect() public {                        // I believe this protect
 
 //    }
 
-/**
- * Sets the agreement reward. I'd like to rewrite this to use the abstracted actors and abstracted token concepts
- * 
- * Povenance: comes from Johan's blog post
- * 
- */
+    /**
+     * Sets the agreement reward. I'd like to rewrite this to use the abstracted actors and abstracted token concepts
+     * 
+     * Povenance: comes from Johan's blog post
+     * 
+     */
 
     function agreementPoA () private { // need to research how to explicitly limit to  (onlyPangea)
     for(uint i = 0; i < actorChoice.length; i++) {
@@ -186,10 +185,10 @@ function lucyProtect() public {                        // I believe this protect
     }
     }
 
-/**
- * Need to study this in depth and migrate it to how I'm handling this. Provenance: Johan's code
- * 
- */
+    /**
+     * Need to study this in depth and migrate it to how I'm handling this. Provenance: Johan's code
+     * 
+     */
 
 
     function newAgreement () private { 
@@ -201,14 +200,14 @@ function lucyProtect() public {                        // I believe this protect
     }
 
  
-/**
- * Registers an agreement between two parties, files it in the "agreementRegistry," which is 
- * apparently only within Pangea (don't exactly know how that's enforced at the present, but assume through access to 
- * a named contract)
- * 
- * Provenance: Johan, with modifications
- * 
- */
+    /**
+     * Registers an agreement between two parties, files it in the "agreementRegistry," which is 
+     * apparently only within Pangea (don't exactly know how that's enforced at the present, but assume through access to 
+     * a named contract)
+     * 
+     * Provenance: Johan, with modifications
+     * 
+     */
 
 function collectAgreement () private {
     uint agreementID;
@@ -237,36 +236,36 @@ function agreementPoA(address[] _citizens) private { // need to research how to 
 
 
 
-/**
- * (5) Lucy receives indication that the transaction has completed to the satisfaction of all concerned parties 
- * 
- * Incomplete: 0%
- * 
- * This could be built-in, but I'm not seeing it, and worry about the "long tail" of incomplete transactions that 
- * are either expensive or reflect poorly upon Bitnation '
- * 
- * 
- * Would be implicit to core contract, I believe
- * 
- */
+    /**
+     * (5) Lucy receives indication that the transaction has completed to the satisfaction of all concerned parties 
+     * 
+     * Incomplete: 0%
+     * 
+     * This could be built-in, but I'm not seeing it, and worry about the "long tail" of incomplete transactions that 
+     * are either expensive or reflect poorly upon Bitnation '
+     * 
+     * 
+     * Would be implicit to core contract, I believe
+     * 
+     */
 
 
 
-/**
- * (6) Lucy elicits a review of fitness and/or automatically assigns a fitness score to all actors
- * 
- * Incomplete: 25%
- * 
- * I was originally planning to modify the following code, which was originally borrowed from a reputation project on git, 
- * but it strikes me as as super complicated, so will probably simplify and/or borrow from Johan's ideas 
- *
- * The code appears to simply ask if the experience was positive or negative. If it's positive, it increments the reputation
- * score. If not, it decrements it. Pretty simple.
- *
- * I intend to add scales of subjective satisfaction (enum 0-5) plus a temporal parameter, and leverage Johan's code for token
- * value manipulation
- * 
- */
+    /**
+     * (6) Lucy elicits a review of fitness and/or automatically assigns a fitness score to all actors
+     * 
+     * Incomplete: 25%
+     * 
+     * I was originally planning to modify the following code, which was originally borrowed from a reputation project on git, 
+     * but it strikes me as as super complicated, so will probably simplify and/or borrow from Johan's ideas 
+     *
+     * The code appears to simply ask if the experience was positive or negative. If it's positive, it increments the reputation
+     * score. If not, it decrements it. Pretty simple.
+     *
+     * I intend to add scales of subjective satisfaction (enum 0-5) plus a temporal parameter, and leverage Johan's code for token
+     * value manipulation
+     * 
+     */
 
   event _positiveReputation(address indexed user, string indexed message);
   event _negativeReputation(address indexed user, string indexed message);
@@ -291,23 +290,23 @@ function giveReputation(address citizen_b, bool isPositive, string message) priv
 }
 
 
-/**
- * (7) Lucy assigns reputation tokens to actors, distributes them to actors through an Oracle 
- * 
- * Incomplete: 20% 
- * 
- * Needs rewardAmount, to make sure the actorChoice and tokenType works, plus that we're actually calling
- * the Oracle, plus a few sanity checks in terms of token distribution. Plus probably lots of other stuff 
- * 
- * Intend to leverage Johan's code sample 
- * 
- */
+    /**
+     * (7) Lucy assigns reputation tokens to actors, distributes them to actors through an Oracle 
+     * 
+     * Incomplete: 20% 
+     * 
+     * Needs rewardAmount, to make sure the actorChoice and tokenType works, plus that we're actually calling
+     * the Oracle, plus a few sanity checks in terms of token distribution. Plus probably lots of other stuff 
+     * 
+     * Intend to leverage Johan's code sample 
+     * 
+     */
 
-/**
- * Distribute tokens (PoA, PoN, PoC)
- * 
- * rewardAmount is not yet defined and this logic is all kinds of broken at the moment 
- */
+    /**
+     * Distribute tokens (PoA, PoN, PoC)
+     * 
+     * rewardAmount is not yet defined and this logic is all kinds of broken at the moment 
+     */
    
     function distToken(address actorChoice) {              // this is a derivative of Johan's code sample, and incomplete
     PoA.balanceOf[_actorChoice.tokenType] += rewardAmount;          // take citizen_a's PoA and add to it the rewardAmount (which is not currently
@@ -322,3 +321,10 @@ function giveReputation(address citizen_b, bool isPositive, string message) priv
 
      
 }
+
+
+
+
+
+
+
