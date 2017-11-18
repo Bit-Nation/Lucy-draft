@@ -1,7 +1,7 @@
-pragma solidity ^0.4.18;            // Because contracts on a blockchain are there forever, I believe you set this to a 
-                                    // specific minimum version so you don't end up having a contract called in the future
-                                    // that is not supported by a then-current version of Solidity, thereby causing problems
-                                    // later on. 
+pragma solidity ^0.4.18;      
+
+
+contract Lucy  is PoA, PoC, PoN { // We'll need to either author, or produce the referenced contracts of "PoA, PoC, PoN"
 
     /**
      * See the README file for detailed overview and status as well as open topics 
@@ -9,100 +9,73 @@ pragma solidity ^0.4.18;            // Because contracts on a blockchain are the
      */
 
 
-
-
-    /**
-     * Declaring the contract "Lucy"
-     * 
-     * Incomplete: 2% progress
-     *
-     * Eventually, and per the notes above, Lucy's completed core functionality will be nested within the following contract 
-     * declaration. Over time expect more sections/functions to be added here as they are completed. 
-     * 
-     * What I do not yet know is which existing contracts that may need to be referenced from Lucy to be functional, for example:
-     * do we need to call a contract so Lucy knows what PoA, PoN, and PoC are?
-     */ 
-
-
-contract Lucy {
-
-
     /** 
-     * (1) INITIALIZING ACTOR "TYPES"
+     * (1) INITIALIZING ACTOR "TYPES," DEFINING THE ACTORS, ASSOCIATING ACTORS WITH TOKENS
      * 
      * Incomplete: 60% progress. 
-     */
-
-    address Citizen;
-    address Witness;
-    address Arbitrator;         // I intend to use a struct to simplify this, plus I'm not sure this is done correctly 
-    address Agreement;          // eg: may be missing uint statements
-    address LegalCode;
-    address Nation;
-    address initiatingActor;
-    // need to define other parties for purposes of token dist - TODO 
-
-    /**
-     * explicitly eliminated "nations" for now, but will need to be addressed. Also needed: multiple witnesses (with hard limit)
-     */
-
-    enum actorChoice { Citizen, Witness, Abritrator, Agreement, LegalCode } // "Nations" would be added here  
-
-
-    /**
-     * Assume "citizen" if not explicitly specified, which seems dangerous. I'd rather require that the actor type be explicitly
-     * defined, else we have a corner case where a nation can review the fitness of a citizen via a PoA
-     */
-
-    actorChoice constant defaultChoice = actorChoice.Citizen;   
-    function setActorType(uint _actorChoice) public {                                                                                                      // not obvious to me how the calling Dapp has an 
-        initiatingActor = msg.sender;                   // "msg.sender" is the entity that calls the contact, ergo:
-    }                                                   // "initiatingActor" is the entity that called the contract 
-                                                        // I just need to figure out how to make sure the Dapp properly
-                                                        // reports or references the actor "type" to Lucy (so nations aren't
-                                                        // treated like citizens, etc)
-
-
-    /**
+     * 
+     * Goals:
+     *  (a) abstract actor from type (citizen; witness(es); arbitrator; code of law; nation) 
+     *  (b) define the actors within the scope of an agreement (a contract) between two or more parties (two or more parties?)
+     *  (c) associate the proper token with each actor type (PoA, PoC, PoN)
+     * 
+     * Primary user interaction 
+     *  - via mobile Dapp (RPC calls provided by mobile app - reference (TBD git location?) for more info)
      * 
      */
-    function getChoice() public returns (actorChoice) {
+
+    /**
+     * (1)(a) DEFINE THE ACTORS AND THEIR TYPES 
+     * 
+     */
+    
+    struct Actor {
+        byte actorType; // Citizen, Arbitrator, Legal Code, Agreement, Nation 
+        address addr;
+        uint tokenType; // I'll associate the proper tokenType per actorType
+        bool canRate;   // Some actors can't provide a rating (PoN)
+        bool isWitness; // Has the actor opted in to being a witness?
+        bool isDapp;    // possible vector - placeholder until I think this through entirely
+    }
+    
+    /**
+     * TODO: work on mapping keys to values for the sake of simplicity and economy 
+     * 
+     */
+     
+    mapping (address => Actor) public actorStruct;
+        function actorValues(address addr) public constant returns(bool isIndeed) {
+    return actorStruct[addr].isEntity;  // pretty sure this doesn't work TODO
     }
 
-    function getDefaultChoice() public returns (uint) {
-        return uint(defaultChoice);
+    /**
+     * TODO: learn how to have the calling Dapp / contract deliver the needed values for this contract to function 
+     * 
+     */
+
+    struct submittedInfo {
+        address actorType;  // I expect the Dapp to capture and send the actorType (Citizen, Arbitrator,etc)
+        uint tokenType;     // Based upon actorType we'll populate tokenType
+        bool isWitness;     // Has the citizen selected chosen to participate as a witness?
+                            // May be other values. Need to think about this further
     }
 
 
 
 
- 
-     /**
-      * (2) INITIALIZING TOKEN TYPE PER ACTOR (PoA, PoC, PoN)
-      * 
-      * Incomplete: 30% complete 
-      */
 
-    function setTokenType() private returns (uint) {
-        uint tokenType;
-        uint PoA;
-        uint PoC;
-        uint PoN;
-        
-    if ((actorChoice == Citizen) || (actorChoice == Witness) || (actorChoice == Arbitrator)) { // may be multiple witnesses
-         tokenType = PoA;
+
+
+
+    
+    /**
+     * Receive payment in ether for use of contract. Required definition  
+     * 
+     */
+      
+    function lucyFee() payable costs(price) {       //broken - TODO  
+        registeredAddresses[msg.sender] = true;
     }
-          else {
-              if ((actorChoice == Agreement) || (actorChoice == LegalCode)) {
-            tokenType = PoN;
-        }
-              if (actorChoice == Nation)         // this merits discussion. We need to account for PoC, but I don't think I
-            tokenType = PoC;                   // want the PoC evaluating the fitness of citizens
-     }
-    }
-
-
-
 
 
     /**
@@ -150,27 +123,6 @@ function lucyProtect() public {                        // I believe this protect
 
 
 
-     /**
-      * (4) FACILITATE CHAT INTERACTON BETWEEN TWO OR MORE ACTORS
-      * 
-      * Incomplete: 15% progress 
-      */
-
-
-    /**
-     * Search for citizens, arbitrators, contracts, legal codes, and nations as well as their PoA, PoC, and PoN
-     */
- 
-    event _viewedReputation (address indexed actorChoice, uint _tokenType); // This searches the transaction log in Ethereum 
-
-    function viewReputation () public {
-        _viewedReputation(actorChoice.tokenType);
-    }
-
-//    function searchCitizen () public {  // need to combine these two
-//        _searchCitizen (actorChoice.tokenType);
-
-//    }
 
     /**
      * Sets the agreement reward. I'd like to rewrite this to use the abstracted actors and abstracted token concepts
@@ -259,8 +211,6 @@ function agreementPoA(address[] _citizens) private { // need to research how to 
      * I was originally planning to modify the following code, which was originally borrowed from a reputation project on git, 
      * but it strikes me as as super complicated, so will probably simplify and/or borrow from Johan's ideas 
      *
-     * The code appears to simply ask if the experience was positive or negative. If it's positive, it increments the reputation
-     * score. If not, it decrements it. Pretty simple.
      *
      * I intend to add scales of subjective satisfaction (enum 0-5) plus a temporal parameter, and leverage Johan's code for token
      * value manipulation
@@ -268,7 +218,7 @@ function agreementPoA(address[] _citizens) private { // need to research how to 
      */
 
   event _positiveReputation(address indexed user, string indexed message);
-  event _negativeReputation(address indexed user, string indexed message);
+
 
 
 
@@ -282,13 +232,7 @@ function giveReputation(address citizen_b, bool isPositive, string message) priv
             _positiveReputation(citizen_b,message);
         }
     }
-    else{
-    citizen_b.negative ++;
-        citizen_b.messages.push(message);
-        _negativeReputation(citizen_b,message);
-    }
-}
-
+    
 
     /**
      * (7) Lucy assigns reputation tokens to actors, distributes them to actors through an Oracle 
