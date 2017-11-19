@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
-    import "./AgreementMade";
+    import "https://github.com/Bit-Nation/Lucy-draft/blob/master/AgreementMade.sol";
 
 contract Mediation is AgreementMade {
     /**
