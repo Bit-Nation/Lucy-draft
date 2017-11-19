@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
-    import "./AgreementMade";
-    import "./Mediation";
+    import "https://github.com/Bit-Nation/Lucy-draft/blob/master/AgreementMade.sol";
+    import "https://github.com/Bit-Nation/Lucy-draft/blob/master/Mediation.sol";
 
 contract ElicitFitnessReview is AgreementMade, Mediation {
     /**
