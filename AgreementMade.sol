@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
-    import "./PangeaTokens";
+    import "https://github.com/Bit-Nation/Lucy-draft/blob/master/PangeaTokens.sol";
 
 contract AgreementMade is PangeaTokens {    // this seems redundant, but want to make sure 
 
