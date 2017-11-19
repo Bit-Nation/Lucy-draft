@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
-    import "https://github.com/Bit-Nation/Pangea-Arbitration-Token-PAT/blob/master/src/sol/PATToken.sol";
+    import "https://github.com/Bit-Nation/Pangea-Arbitration-Token-PAT/blob/master/src/sol/AbstractToken.sol";
 
 contract PangeaTokens {
 
