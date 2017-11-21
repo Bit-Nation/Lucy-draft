@@ -1,7 +1,9 @@
 pragma solidity ^0.4.18;
     import "https://github.com/Bit-Nation/Lucy-draft/blob/master/PangeaTokens.sol";
-
-contract AgreementMade is PangeaTokens {    // this seems redundant, but want to make sure 
+    import "https://github.com/Bit-Nation/Lucy-draft/blob/master/agreementRegistryIFPS.sol";
+    
+contract AgreementMade is PangeaTokens, agreementRegistryIFPS {    // this seems redundant, but want to make sure 
+                                                                    // TODO: ensure I've added payable for applicable functions
 
 
     /**
@@ -13,7 +15,7 @@ contract AgreementMade is PangeaTokens {    // this seems redundant, but want to
      * 
      */
     struct Actor {
-        uint actorType;         // TODO: has to be defined in the Dapp - Citizen, Arbitrator, Legal Code, Agreement, Nation 
+        uint actorType;         // TODO: has to be defined in the Dapp - Citizen, Witness, Arbitrator, Legal Code, Agreement, Nation 
         address actorAddr;      // Address for the actor participating in the transcation 
         uint tokenType;         // I'll associate the proper tokenType per actorType
         uint actorTokenBal;     // The balance of tokens associated with the actor - Citizen, Arbitrator, Legal Code, Agreement, Nation
@@ -52,6 +54,7 @@ contract AgreementMade is PangeaTokens {    // this seems redundant, but want to
        uint agreementDeadline;  // Allows for the definition of a temporal deadline
        uint agreementTerms;     // Aka: the contract between the two parties. Staying away from "contract" within the context of Solidity
        string agreementStatus;  // Implies a string table containing a variety of statuses (which may also facilitate localization efforts)
+       bytes32 agreementSig;    // Agreement signatures 
        bool agreementEnded;     // Yes or no: is the agreement finalized?
        uint agreementAwardVal;  // Amount value (merits definition - in this contract? TODO)
     }
@@ -65,6 +68,7 @@ contract AgreementMade is PangeaTokens {    // this seems redundant, but want to
         uint agreedeadline,
         uint agreeterms,
         string agreestat,
+        bytes32 agreesig,
         bool agreeend,
         uint agreeawval)
         public {
@@ -72,15 +76,12 @@ contract AgreementMade is PangeaTokens {    // this seems redundant, but want to
             agreedeadline = [Agreement].agreementDeadline;
             agreeterms = [Agreement].agreementTerms;
             agreestat = [Agreement].agreementStatus;
+            agreesig = [Agreement].agreementSig;
             agreeend = [Agreement].agreementEnded;
             agreeawval = [Agreement].agreementAwardVal;
         }
             
      
-     /**
-      * functions
-      * 
-      */
 
     /** Sanity check: is the actor allowed to define an agreement with another party?*/
     function isAllowedToMakeAgreement(uint atype, bool ymakeagree, bool iswit) public {     // TODO: make this simpler, because: yuck 
@@ -98,43 +99,62 @@ contract AgreementMade is PangeaTokens {    // this seems redundant, but want to
         agreementRegistry[agreeid] = agreeterms;
     }
 
+     /**
+      * TODO: (1) define new agreement 
+      * 
+      */
+
+    function createAgreement (
+        uint _agreeid,
+        uint _agreedeadline,
+        uint _agreeterms,
+        string _agreestat,
+        bytes32 _agreesig,
+        bool _agreeend,
+        uint _agreeawval,
+        uint _atype, 
+        address _aaddr, 
+        uint _ttype, 
+        uint _atokenbal,          
+        bool _yrate, 
+        bool _ymakeagree, 
+        bool _iswit, 
+        bool _isdapp) public payable {
+            return createAgreement(); // clumsy. TODO revisit this soon 
+        }
+
+    
+     /**
+      * TODO: increment nonces - don't appear to be necessary, as non-contract accounts' nonces are automatically
+      * incremented when they originate a transcation 
+      * 
+      */    
 
 
- 
-    /**
-     * Work in progress: putting some thought into how we define what goes into the agreementRegistry TODO
-     * 
-    function newAgreement(
-        uint actorType, 
-        address actorAddr, 
-        uint tokenType, 
-        bool canMakeAgreement, 
-        bool isWitness, 
-        bool isDapp, 
-        uint agreementID,
-        uint agreementDeadline) {
-            Agreement storage a =   // working on committing values to storage 
-            
+
+     /**
+      * TODO: (3) update agreementRegistry (on IPFS)
+      * 
+      */
+
+    function registerAgreement () public {  // incomplete: still researching interaction with IPFS 
+     
+        
     }
-    */
-
-
-    /** Registers the agreement - incomplete TODO*/
-    function registerAgreement(uint _actorAddr, uint _actorType, uint _deadline, uint _terms) public { 
-
-    }
+        
+        
 
 
 
 
     /** If agreement ends to satisfaction, calls contract Lucy. If not, calls contract Arbitration/Mediation*/    
     function startFitnessReview () public {
-        ElicitFitnessReview e = ElicitFitnessReview("ElicitFitnessReview_address");   //hard-coded address for contract? TODO
+        ElicitFitnessReview e = ElicitFitnessReview("ElicitFitnessReview_address");   //hard-coded address for smart contract? Or just function call? TODO
         return e.sanityCheck();
     }    
     
     function startMediation () public {
-        Mediation m = Mediation("Mediation_address");  //hard-coded address for contract? TODO
+        Mediation m = Mediation("Mediation_address");  //hard-coded address for smart contract? or just function call? TODO
         return m.registerArbitrationID(); // begin arbitration from within the contract "Mediation"
     } 
     
@@ -147,5 +167,13 @@ contract AgreementMade is PangeaTokens {    // this seems redundant, but want to
         else 
             startMediation;
         }
+
+     /**
+      * Fallback function (self-protection)  
+      * 
+      * Note: no longer needed after 0.4.0 
+      * 
+      */
+
 
 }
