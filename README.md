@@ -1,19 +1,44 @@
-# Lucy-draft - 16 Nov 2017
+# Lucy-draft - 6 Dec 2017
+
+I've elected to split Lucy's functions into separate contracts, as such:
+
+- Define and create the agreement between two parties (AgreementMade.sol)
+- Solicit and assign a fitness rating to the parties involved at the end of the transaction (ElicitFitnessReview.sol)
+- If there's disagreement about the transaction, Lucy orchestrates mediation/arbitration (Mediation.sol)
+- A placeholder for creating PoA, PoC, and PoN (haven't yet seen that contract) (PangeaTokens.sol)
+- Actual distribution of the tokens (Lucy.sol)
+
+Open issues:
+
+(All contracts)
+- How to limit execution to Pangea (define and use a single method)
+- Data architecture as it pertains to the AgreementRegistry (align the state variables across the contracts, and ensure we're properly defining how data is declared, in the interest of economy, utility, and cost)
+
+(AgreementMade.sol)
+- Writing to the AgreementRegistry: assumed through Oracle, and stored on IPFS (with Filecoin incentivization for data persistence)
+
+(ElicitFitnessReview.sol)
+- I've defined a matrix of fitness scoring options I'd like to solidify upon because it would form the basis of the automated fitness scoring from a future version of Lucy - to review (and not currently in the contract)
+
+(Mediation.sol)
+- Updating status of the agreement so people can see how things are progressing at a glance (usability feature)
+- What happens if one party isn't satisfied with the arbitrator? I'd argue this is an option to call this contract, again, to rate the performance of the arbitrator - just need to make sure it doesn't loop forever, or beyond what's reasonable)
+
+(Lucy.sol)
+- Collects the fitness scoring, citizen and "actor" info, distributes tokens, etc
 
 
-HIGH LEVEL FUNCTIONAL OVERVIEW (approximately chronological). 
+Open worries (from first version):
 
-Pro-tip: copy and paste into remix.ethereum.org to see what's working and needs remediation
+Q: Enforce certain hard contraints to "actors" to protect against popularity contests and/or retribution
 
-(1) Initialize actor type (citizen; witnesses; arbitrator; agreement (aka a contract); code of law; nation; etc)
-
-Enforce certain hard contraints (examples: can nations evaluate the fitness of a citizen? Do we want to inhibit the ability for certain automated actors to evaluate the fitness of a citizen? 
+Examples: can nations evaluate the fitness of a citizen? Do we want to inhibit the ability for certain automated actors to evaluate the fitness of a citizen? 
 
 I believe we may want to consider the disproportionate influence automated actors may have in the future, relative to citizens. 
 
 Consider, for instance, a semi-autonomous code of law Dapp that is "self-pruning" through the use of predictive analytics and evaluation of data within the Exocortex. This could become a hell of a potent entity/actor within Bitnation, and we may want to consider the wisdom of applying constraints to certain scenarios that are currently "corner cases")
 
-In terms of Solidity, I aspire to have two primary actors, but abstracted. In Solidity, "msg.sender" is the actor that initiated the transaction, and will serve as one "actor" (in this first example, citizen_a), and then there's the other party (currently citizen_b).
+In terms of Solidity, I aspire to have two primary actors, but abstracted. In Solidity, "msg.sender" is the actor that initiated the transaction, and will serve as one "actor" (in this first example, citizen_a), and then there's the other party.
 
 In the context of a feature-complete Lucy, there's actually multiple actors: witnesses, arbitrators, codes of law, smart contracts, nations, and possibly other entities or actors. 
      
@@ -21,22 +46,16 @@ For instance, "msg.sender" could be a citizen; an arbitrator; an arbitration Dap
 
 ...or could it? 
 
-I'm troubled by the idea that Lucy should not allow some actors to evaluate the fitness of citizens, for instance. Do we really want an "economic zone" to evaluate the fitness of a citizen? What about a Dapp automated arbitration service that is in some manner affiliated with a nation?
+I'm troubled by the idea that Lucy should not allow some actors to evaluate the fitness of citizens, for instance. Do we really want an "economic zone" (an entity) to evaluate the fitness of a citizen? What about a Dapp automated arbitration service that is in some manner affiliated with a nation?
 
 
-(2) Initialize token type per actor (PoA; PoC; PoN)
+Q: Impose hard limits of token types per actor (PoA; PoC; PoN)
 
 Enforce certain hard contraints that may inhibit attack vectors (related to above-stated concern). Intention is to take actor type and associate it with proper token type.
 
 Risk scenario: make sure that there aren't corner cases where, for instance: an artibrator associated with a PoA establishes a highly-regarded reputation, and months later "upgrades" to an automated atribration Dapp that's in some manner manipulated by an economic zone to effect disproportionately negative fitness ratings upon citizens. 
 
-Imbalance: small number of "puppet masters" (actors) relative to high level of fitness. 
-
-I want to think through all the ways we can ensure compartmentalization at several levels, both at the actor level (see above) and the token level, if this proves to make sense
-
-There may be instances where an actor type may merit another kind of token once its crossed the line to become something else entirely. Again, this is speculative, and abstolutely a strategic concern
- 
-In terms of an attack vector, and from the perspective of a "black hat," it's abstolutely what I'd consider doing: 
+Imbalance: small number of "puppet masters" (actors) relative to high level of fitness. Kind of a mix between IRL coersion and a sybil attack. 
 
 I'd come in slow and low as a "person," and in time upgrade to something more automated, leveraging in some manner the reputation I'd carefully cultivated as an individual. 
 
@@ -44,44 +63,15 @@ Later, I'd leverage the equity of my (Dapp) accumulated reputation to cultivate 
 
 I posit that an individual has far less capability to do this as well as an automated Dapp that can accumulate far greater reputation and influence on behalf of a "puppetmaster," whereas a PoC, for instance, has implicit (and possibly explicit) constraints that inhibit such systemic manipulation
 
-I need Johan's brains right now (zombie sounds)  :)
 
-
-(3) Santity checks and self-protection 
+Q: Santity checks and self-protection 
 
 We may need to include logic that protects us from standardized nonsense, for instance a single actor setting up a large number of actors within the Bitnation ecosystem and hammering at us with incomplete transactions resulting in some kind of weird economic DOS I still need to think through within the context of Dapps and token value
 
 
-(4) Lucy facilitates chat between two or more entities (actors)
+Q: Make sure agreement ends within proper temporal constraints
 
-Is it helpful or confusing to refer to this as a "chatbot" interaction?
-
-If so, I posit that we are at risk of "overloading" the chatbot functionality in this contract to the extent that this one could become unduly expensive, in terms of transaction costs
-
-We may consider putting most of the more mundane chatbot functionality into a seperate contract that calls this contract, if necessary, to ensure that Bitnation-based solutions remain economically-viable even if Ethereum or other blockchain/post-blockchain architectures become expensive in the future (already a problem with Bitcoin and some Ethereum-based Dapps)
-
-In any event, if and when a contract is settled upon, the chatbot functionality of Lucy facilitates the other actors (witnesses, arbitrators, codes of law, etc), the contract being digitally signed, and its being written to the blockchain (Ethereum, for now, but agnostic to blockchain or post-blockchain in the future)
-
-I'm assuming this is where we capture the core of the "chatbot" capability, which frankly seems expensive to me, in terms of transaction costs.
-
-Thinking that perhaps we consider taking most of the chatbot functionality, dropping it into a separate smart contract, and in the event the chat exchange evolves to become a transaction, this smart contract is called
-
-Chatbot needs to have:
-     Find citizen (by name and sorted by PoA - UI function)
-     Find witness(es) (by name and sorted by PoA - UI function)
-     Ask citizen to be witness
-     Find arbitrator (sorted by PoA and name - UI function)
-     Find code of law (sorted by name and PoN - UI function)
-     Find or write contract, or what I call an Agreement to reduce confusion with Smart Contracts (currently undefined, but large UI functionality)
-     Other functions yet to be defined
-
-
-
-(5) Lucy receives indication that the transaction has completed to the satisfaction of all concerned parties 
-
-I can't say I'm entirely satisfied with how we make sure ab arrangement actually completes, or does so within proper constraints. 
-
-For instance, are there not scenarios where a dispute occurs, but the dispute draws out for years? 
+Original concern: are there not scenarios where a dispute occurs, but the dispute draws out for years? 
 
 My concern isn't so much about how we make sure the actors come to an agreement in a timely manner; I worry about the "long tail" of lengthy disputes, their association with old world actors, and the possible negative impact this could have upon the financial viability of the PAT tokens, perceived efficacy of Bitnation-based solutions, etc etc. 
 
@@ -91,11 +81,14 @@ Other than the instance where proxies of old world entities contrive these scena
 
 It's from this perspective that I'm considering a hard limit on dispute duration, or at least some temporal parameter that's in some manner impacted by the transaction cost or value of PAT, or something. I need to draw this vector out more before I can feel good about it.
 
+Dana suggested a financial incentive for ending transcations early. I like it. Still merits definition.
 
 
-(6) Lucy elicits a review of fitness and/or automatically assigns a fitness score to all actors 
+Q: Fitness scoring 
 
 In the first version I'm pretty sure we're going to have something pretty simple: "on a scale of one to five stars, how would you rate your satisfaction with this actor?" - something reminicent of Uber or Lyft, etc 
+
+Add to it a couple other questions about timeliness and "would you suggest this to a friend or colleague" and you have a solid start at something which resembles a Net Promoter score.
 
 However, I can see the next step being satisfaction rating (fitness) that's a function of subjective satisfaction plus temporal duration (see above) as a built-in incentive for bringing these disputes to closure, sooner rather than later.
 
@@ -106,13 +99,14 @@ In later releases I am playing with automatically-assigned fitness for merging e
 For the first release, I intend to add scales of subjective satisfaction (enum 0-5) plus a temporal parameter, and leverage a derivative of Johan's code for token value manipulation
 
 
-(7) Lucy assigns reputation tokens to actors, distributes them to actors through an Oracle 
-     
+Q: Functions that call the oracle
 
-HIGH LEVEL QUESTIONS 
+Token distribution?
 
-How many of our functions are supposed to be "public," meaning: do we want contracts to be able to call them from 
-     outside Lucy?
+Score updates per citizen (actor)
+
+Updates to the various registries (on IPFS)
+
 
 
 
